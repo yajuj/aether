@@ -1,0 +1,36 @@
+{
+    # Email для Let's Encrypt уведомлений
+    email admin@example.com
+    
+    # Автоматически согласиться с условиями Let's Encrypt
+    acme_ca https://acme-v02.api.letsencrypt.org/directory
+}
+
+:80 {
+    # Для разработки, в продакшене замените на ваш домен
+    bind 0.0.0.0
+    
+    # Корневая директория с собранным фронтендом
+    root * /srv
+    
+    # Включаем gzip сжатие
+    encode gzip
+    
+    # Для SPA приложений
+    try_files {path} /index.html
+    
+    # Раздача статических файлов
+    file_server
+    
+    # Проксирование API запросов
+    handle /api/* {
+        reverse_proxy api:3001
+    }
+    
+    # Автоматическое получение и обновление SSL сертификатов
+    tls {
+        protocols tls1.2 tls1.3
+        # Для разработки можно использовать самоподписанные сертификаты
+        on_demand
+    }
+} 
